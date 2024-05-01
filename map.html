@@ -3,24 +3,30 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Data Visualization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LifeLines</title>
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- Link to external stylesheet -->
     <link rel="stylesheet" type="text/css" href="./style.css">
 </head>
+
 
 <body>
     <div id="mapContainer">
         <!-- Dropdown for selecting the year -->
-        <label for="yearSelector">Select Year:</label>
-        <select id="yearSelector"></select>
+        <div class="choose-year">
+            <label for="yearSelector">Select Year:</label>
+            <select id="yearSelector"></select>
 
-        <!-- Slider for dynamic year selection -->
-        <label for="yearSlider">Slide Year:</label>
-        <input type="range" id="yearSlider" class="year-slider" min="1543" max="2021" value="2021" step="1">
-        <span id="yearDisplay">2021</span>
+            <!-- Slider for dynamic year selection -->
+            <label for="yearSlider">Slide Year:</label>
+            <input type="range" id="yearSlider" class="year-slider" min="1543" max="2021" value="2021" step="1">
+            <span id="yearDisplay">2021</span>
+        </div>
+
 
         <!-- SVG for the map -->
         <svg id="my_dataviz" width="800" height="600"></svg>
@@ -29,6 +35,9 @@
         <div id="tooltip"
             style="position: absolute; opacity: 0; pointer-events: none; background-color: white; border: solid 1px #ccc; padding: 10px;">
         </div>
+
+        <!-- Color Legend -->
+        <svg id="legend" width="300" height="50"></svg>
     </div>
 
     <script>
@@ -51,6 +60,50 @@
                 "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa", "#3cb7b0",
                 "#10a4b3", "#0091b0", "#0071a6", "#005198", "#002f80", "#19005e"
             ]);
+
+        // Define the SVG for the legend
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get the width of the container
+            var containerWidth = document.getElementById('mapContainer').clientWidth;
+
+            // Adjust for any padding or borders here if necessary
+            var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
+
+            var legendWidthFraction = 0.8; // 80% of the container width
+            var legendWidth = adjustedWidth * legendWidthFraction;
+
+            var legendSvg = d3.select('#legend')
+                .attr('width', legendWidth)
+                .attr('height', 50);
+
+            // Draw the legend
+            var legendWidth = +legendSvg.attr("width"),
+                legendHeight = +legendSvg.attr("height"),
+                legendSegmentWidth = legendWidth / colorScale.range().length;
+
+            legendSvg.selectAll("rect")
+                .data(colorScale.range().map(function (color) {
+                    var d = colorScale.invertExtent(color);
+                    if (d[0] == null) d[0] = colorScale.domain()[0];
+                    if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1];
+                    return d;
+                }))
+                .enter().append("rect")
+                .style("fill", function (d) { return colorScale(d[0]); })
+                .attr("x", function (d, i) { return legendSegmentWidth * i; })
+                .attr("y", 0)
+                .attr("width", legendSegmentWidth)
+                .attr("height", legendHeight - 20);
+
+
+            legendSvg.selectAll("text")
+                .data(colorScale.domain())
+                .enter().append("text")
+                .attr("x", function (d, i) { return i * legendSegmentWidth + (legendSegmentWidth / 2); }) // Center the text
+                .attr("y", legendHeight - 5)
+                .attr("text-anchor", "middle") // Make sure this is set to "middle"
+                .text(function (d) { return d + " years"; });
+        });
 
         d3.csv("life-expectancy.csv", function (error, data) {
             if (error) throw error;
@@ -94,6 +147,8 @@
                 selector.property('value', selectedYear);
                 updateMap(selectedYear, globalData);
             };
+
+
         });
 
 

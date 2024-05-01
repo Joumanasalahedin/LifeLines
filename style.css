@@ -6,12 +6,22 @@
     width: 90%;
     box-sizing: border-box;
     position: relative;
-    /* For positioning inner elements absolutely relative to this container */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.choose-year {
+    width: 70%;
+    display: inline;
+    margin: 10px;
+}
+
+.choose-year label {
+    margin-left: 10px;
 }
 
 .year-slider {
     width: 60%;
-    /* Adjust this value based on your layout needs */
-    margin: 10px 0;
-    /* Provides some space around the slider */
+    margin-left: 10px;
 }
