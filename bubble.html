@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LifeLines</title>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <!-- Load color scale -->
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+
+<body>
+    <!-- Create a div where the graph will take place -->
+    <div id="bubbleContainer"></div>
+
+    <!-- Tooltip container -->
+    <div id="tooltip"
+        style="position: absolute; opacity: 0; pointer-events: none; background-color: white; border: solid 1px #ccc; padding: 10px;">
+    </div>
+
+    <script>
+        var margin = { top: 10, right: 20, bottom: 30, left: 50 },
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        var svg = d3.select("#bubbleContainer")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var tooltip = d3.select("#tooltip");
+
+        var x = d3.scaleLog().domain([1000, 100000]).range([0, width]).clamp(true);
+        var y = d3.scaleLinear().domain([55, 85]).range([height, 0]).clamp(true);
+        var z = d3.scaleSqrt().domain([0, 1310000000]).range([2, 30]);
+        var myColor = d3.scaleOrdinal().domain(["Asia", "Europe", "Americas", "Africa", "Oceania"]).range(d3.schemeSet2);
+
+        d3.csv("data_2020.csv", function (data) {
+            data.forEach(function (d) {
+                // Convert strings to numbers
+                d['GDP per capita'] = +d['GDP per capita'];
+                d['Period life expectancy at birth'] = +d['Period life expectancy at birth'];
+                d['Population (historical estimates)'] = +d['Population (historical estimates)'];
+            });
+
+            // Visualization setup continues...
+            svg.append("g").attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x).tickValues([1000, 2000, 5000, 10000, 20000, 50000, 100000])
+                    .tickFormat(d3.format("$,")));
+            svg.append("g")
+                .call(d3.axisLeft(y).tickValues([55, 60, 65, 70, 75, 80, 85]));
+
+            var circles = svg.append('g')
+                .selectAll("circle")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) { return x(Math.max(1000, Math.min(100000, d['GDP per capita']))); })
+                .attr("cy", function (d) { return y(Math.max(55, Math.min(85, d['Period life expectancy at birth']))); })
+                .attr("r", function (d) { return z(d['Population (historical estimates)']); })
+                .style("fill", function (d) { return myColor(d['Continent']); })
+                .style("opacity", "0.7")
+                .attr("stroke", "white")
+                .style("stroke-width", "2px");
+
+            circles.on("mouseover", function (d) {
+                tooltip.transition().duration(200).style("opacity", .9);
+                tooltip.html("<strong>" + d.Entity + "</strong>" +
+                    "<br/>GDP per Capita: $" + d['GDP per capita'].toFixed(2) +
+                    "<br/>Life Expectancy: " + d['Period life expectancy at birth'].toFixed(2) + " years" +
+                    "<br/>Population: " + d['Population (historical estimates)'].toLocaleString())
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+
+                // Dim other circles
+                circles.style("opacity", 0.2);
+                d3.select(this).style("opacity", 1);  // Highlight the current circle
+            })
+                .on("mouseout", function () {
+                    tooltip.transition().duration(500).style("opacity", 0);
+                    // Restore opacity for all circles
+                    circles.style("opacity", 0.7);
+                });
+        });
+    </script>
+</body>
+
+</html>

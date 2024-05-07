@@ -1,10 +1,7 @@
 import pandas as pd
 
 # Load the CSV file
-data = pd.read_csv('life-expectancy.csv')
+data = pd.read_csv('life_vs_gdp.csv')
 
-# Filter the data for the year 2020
-data_2020 = data[data['Year'] == 1966]
-
-# Save the filtered data to a new CSV file
-data_2020.to_csv('life-expectancy-1966.csv', index=False)
+data_2020 = data[data['Year'] == 2020]
+data_2020.to_csv("data_2020.csv", index=False)
