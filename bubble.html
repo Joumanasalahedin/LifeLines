@@ -21,9 +21,9 @@
     </div>
 
     <script>
-        var margin = { top: 10, right: 20, bottom: 30, left: 50 },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        var margin = { top: 40, right: 30, bottom: 30, left: 80 },
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
 
         var svg = d3.select("#bubbleContainer")
             .append("svg")
@@ -36,8 +36,9 @@
 
         var x = d3.scaleLog().domain([1000, 100000]).range([0, width]).clamp(true);
         var y = d3.scaleLinear().domain([55, 85]).range([height, 0]).clamp(true);
-        var z = d3.scaleSqrt().domain([0, 1310000000]).range([2, 30]);
-        var myColor = d3.scaleOrdinal().domain(["Asia", "Europe", "Americas", "Africa", "Oceania"]).range(d3.schemeSet2);
+        var z = d3.scaleSqrt().domain([0, 1310000000]).range([2, 20]);
+        var myColor = d3.scaleOrdinal().domain(["Asia", "Europe", "North America", "South America", "Africa", "Oceania"])
+            .range(["#324A5F", "#8F0079", "#6DB1BF", "#E462A8", "#838B55", "F0803C"]);
 
         d3.csv("data_2020.csv", function (data) {
             data.forEach(function (d) {
@@ -47,12 +48,48 @@
                 d['Population (historical estimates)'] = +d['Population (historical estimates)'];
             });
 
-            // Visualization setup continues...
             svg.append("g").attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x).tickValues([1000, 2000, 5000, 10000, 20000, 50000, 100000])
                     .tickFormat(d3.format("$,")));
             svg.append("g")
                 .call(d3.axisLeft(y).tickValues([55, 60, 65, 70, 75, 80, 85]));
+
+            // List of additional countries you want to label explicitly
+            var additionalLabels = ["Japan", "China", "Australia", "Egypt", "Saudi Arabia", "United States", "United Kingdom"];
+
+            // Sort data by GDP per capita and life expectancy for linear labeling
+            var sortedData = data.sort(function (a, b) {
+                return d3.ascending(+a['GDP per capita'], +b['GDP per capita']) || d3.ascending(+a['Period life expectancy at birth'], +b['Period life expectancy at birth']);
+            });
+
+            // Select a subset of sorted data for labeling
+            var dynamicallyLabeledData = sortedData.filter(function (d, i) {
+                return i % Math.floor(sortedData.length / 15) === 0;
+            });
+
+            // Combine dynamically selected data with manually specified labels
+            var labeledData = dynamicallyLabeledData.concat(
+                data.filter(function (d) {
+                    return additionalLabels.includes(d.Entity) && !dynamicallyLabeledData.find(l => l.Entity === d.Entity);
+                })
+            );
+
+            // Adding labels
+            svg.append('g')
+                .selectAll("text")
+                .data(labeledData)
+                .enter()
+                .append("text")
+                .attr("x", function (d) { return x(Math.max(1000, Math.min(100000, +d['GDP per capita']))) + 5; })
+                .attr("y", function (d) { return y(Math.max(55, Math.min(85, +d['Period life expectancy at birth']))) - 15; })
+                .text(function (d) { return d.Entity; })
+                .attr("font-size", "14px")
+                .attr("text-anchor", "middle")
+                .attr("alignment-baseline", "middle")
+                .style("fill", function (d) { return myColor(d['Continent']); })
+                .attr("font-weight", "bold")
+                .attr("stroke", "white")
+                .style("stroke-width", "0.1px");
 
             var circles = svg.append('g')
                 .selectAll("circle")
@@ -76,13 +113,11 @@
                     .style("left", (d3.event.pageX + 5) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
 
-                // Dim other circles
                 circles.style("opacity", 0.2);
                 d3.select(this).style("opacity", 1);  // Highlight the current circle
             })
                 .on("mouseout", function () {
                     tooltip.transition().duration(500).style("opacity", 0);
-                    // Restore opacity for all circles
                     circles.style("opacity", 0.7);
                 });
         });
