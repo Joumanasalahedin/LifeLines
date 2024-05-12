@@ -144,9 +144,10 @@ function updateMap(year, data) {
                     .style("opacity", 0.9);
                 tooltip.html("Country: " + (d.properties.name || "Unknown") + "<br>Birth Rate: " +
                     (d.properties.lifeExpectancy ? d.properties.lifeExpectancy.toFixed(2) : "No data"))
-                var containerRect = document.getElementById('birth_rate').getBoundingClientRect();
-                tooltip.style("left", (d3.event.pageX - containerRect.left + 10) + "px")
-                    .style("top", (d3.event.pageY - containerRect.top - 15) + "px");
+                var mouse = d3.mouse(svg.node());
+
+                tooltip.style("left", (mouse[0] + 10) + "px")
+                    .style("top", (mouse[1] - 28) + "px");
 
                 // Highlight the hovered country without changing the fill
                 d3.select(this)

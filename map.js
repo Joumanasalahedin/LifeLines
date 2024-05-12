@@ -12,42 +12,39 @@ var path = d3.geoPath().projection(projection);
 
 var globalData; // Store the data globally after initial load
 var colorScale = d3.scaleThreshold()
-    .domain([40, 45, 50, 55, 60, 65, 70, 75, 80, 85])
+    .domain([35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90])
     .range([
-        "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa",
-        "#3cb7b0", "#10a4b3", "#0091b0", "#0071a6", "#005198", "#19005e"
+        "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa", "#3cb7b0",
+        "#10a4b3", "#0091b0", "#0071a6", "#005198", "#002f80", "#19005e"
     ]);
 
 // Define the SVG for the legend
 document.addEventListener("DOMContentLoaded", function () {
+    // Get the width of the container
     var containerWidth = document.getElementById('mapContainer').clientWidth;
+
+    // Adjust for any padding or borders here if necessary
     var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
-    var legendWidthFraction = 0.7;
+
+    var legendWidthFraction = 0.8; // 80% of the container width
     var legendWidth = adjustedWidth * legendWidthFraction;
 
     var legendSvg = d3.select('#legend')
         .attr('width', legendWidth)
-        .attr('height', 40);
+        .attr('height', 50);
 
     // Draw the legend
     var legendWidth = +legendSvg.attr("width"),
         legendHeight = +legendSvg.attr("height"),
         legendSegmentWidth = legendWidth / colorScale.range().length;
 
-    var data = colorScale.range().map(function (color) {
-        var d = colorScale.invertExtent(color);
-        if (d[0] == null) d[0] = colorScale.domain()[0] - 10;
-        if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1] + 10;
-        return d;
-    });
-
-    // Handling overlap by adjusting the first range to start from the correct minimum
-    if (data[0] && data[0][0] == data[1][0]) {
-        data[0][0] = data[0][0] - 5; // Adjust this value as needed
-    }
-
     legendSvg.selectAll("rect")
-        .data(data)
+        .data(colorScale.range().map(function (color) {
+            var d = colorScale.invertExtent(color);
+            if (d[0] == null) d[0] = colorScale.domain()[0];
+            if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1];
+            return d;
+        }))
         .enter().append("rect")
         .style("fill", function (d) { return colorScale(d[0]); })
         .attr("x", function (d, i) { return legendSegmentWidth * i; })
@@ -55,12 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("width", legendSegmentWidth)
         .attr("height", legendHeight - 20);
 
+
     legendSvg.selectAll("text")
         .data(colorScale.domain())
         .enter().append("text")
-        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth; }) // This positions the text at the right edge of each rectangle
+        .attr("x", function (d, i) { return i * legendSegmentWidth + (legendSegmentWidth / 2); }) // Center the text
         .attr("y", legendHeight - 5)
-        .attr("text-anchor", "middle") // Align text to the start (left side) at the right edge of the rectangle
+        .attr("text-anchor", "middle") // Make sure this is set to "middle"
         .text(function (d) { return d + " years"; });
 });
 
@@ -144,9 +142,8 @@ function updateMap(year, data) {
                     .style("opacity", 0.9);
                 tooltip.html("Country: " + (d.properties.name || "Unknown") + "<br>Life Expectancy: " +
                     (d.properties.lifeExpectancy ? d.properties.lifeExpectancy.toFixed(2) : "No data"))
-                var containerRect = document.getElementById('my_dataviz').getBoundingClientRect();
-                tooltip.style("left", (d3.event.pageX - containerRect.left + 10) + "px")
-                    .style("top", (d3.event.pageY - containerRect.top - 15) + "px");
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
 
                 // Highlight the hovered country without changing the fill
                 d3.select(this)
