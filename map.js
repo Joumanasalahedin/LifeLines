@@ -144,8 +144,9 @@ function updateMap(year, data) {
                     .style("opacity", 0.9);
                 tooltip.html("Country: " + (d.properties.name || "Unknown") + "<br>Life Expectancy: " +
                     (d.properties.lifeExpectancy ? d.properties.lifeExpectancy.toFixed(2) : "No data"))
-                    .style("left", (d3.event.pageX + 5) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                var containerRect = document.getElementById('my_dataviz').getBoundingClientRect();
+                tooltip.style("left", (d3.event.pageX - containerRect.left + 10) + "px")
+                    .style("top", (d3.event.pageY - containerRect.top - 15) + "px");
 
                 // Highlight the hovered country without changing the fill
                 d3.select(this)
