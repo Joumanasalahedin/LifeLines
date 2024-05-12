@@ -12,21 +12,17 @@ var path = d3.geoPath().projection(projection);
 
 var globalData; // Store the data globally after initial load
 var colorScale = d3.scaleThreshold()
-    .domain([35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90])
+    .domain([40, 45, 50, 55, 60, 65, 70, 75, 80, 85])
     .range([
-        "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa", "#3cb7b0",
-        "#10a4b3", "#0091b0", "#0071a6", "#005198", "#002f80", "#19005e"
+        "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa",
+        "#3cb7b0", "#10a4b3", "#0091b0", "#0071a6", "#005198", "#19005e"
     ]);
 
 // Define the SVG for the legend
 document.addEventListener("DOMContentLoaded", function () {
-    // Get the width of the container
     var containerWidth = document.getElementById('mapContainer').clientWidth;
-
-    // Adjust for any padding or borders here if necessary
     var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
-
-    var legendWidthFraction = 0.8; // 80% of the container width
+    var legendWidthFraction = 0.8;
     var legendWidth = adjustedWidth * legendWidthFraction;
 
     var legendSvg = d3.select('#legend')
@@ -38,13 +34,20 @@ document.addEventListener("DOMContentLoaded", function () {
         legendHeight = +legendSvg.attr("height"),
         legendSegmentWidth = legendWidth / colorScale.range().length;
 
+    var data = colorScale.range().map(function (color) {
+        var d = colorScale.invertExtent(color);
+        if (d[0] == null) d[0] = colorScale.domain()[0] - 10;
+        if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1] + 10;
+        return d;
+    });
+
+    // Handling overlap by adjusting the first range to start from the correct minimum
+    if (data[0] && data[0][0] == data[1][0]) {
+        data[0][0] = data[0][0] - 5; // Adjust this value as needed
+    }
+
     legendSvg.selectAll("rect")
-        .data(colorScale.range().map(function (color) {
-            var d = colorScale.invertExtent(color);
-            if (d[0] == null) d[0] = colorScale.domain()[0];
-            if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1];
-            return d;
-        }))
+        .data(data)
         .enter().append("rect")
         .style("fill", function (d) { return colorScale(d[0]); })
         .attr("x", function (d, i) { return legendSegmentWidth * i; })
@@ -52,13 +55,12 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("width", legendSegmentWidth)
         .attr("height", legendHeight - 20);
 
-
     legendSvg.selectAll("text")
         .data(colorScale.domain())
         .enter().append("text")
-        .attr("x", function (d, i) { return i * legendSegmentWidth + (legendSegmentWidth / 2); }) // Center the text
+        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth; }) // This positions the text at the right edge of each rectangle
         .attr("y", legendHeight - 5)
-        .attr("text-anchor", "middle") // Make sure this is set to "middle"
+        .attr("text-anchor", "middle") // Align text to the start (left side) at the right edge of the rectangle
         .text(function (d) { return d + " years"; });
 });
 
