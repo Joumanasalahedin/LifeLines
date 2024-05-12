@@ -22,12 +22,12 @@ var colorScale = d3.scaleThreshold()
 document.addEventListener("DOMContentLoaded", function () {
     var containerWidth = document.getElementById('mapContainer').clientWidth;
     var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
-    var legendWidthFraction = 0.8;
+    var legendWidthFraction = 0.7;
     var legendWidth = adjustedWidth * legendWidthFraction;
 
     var legendSvg = d3.select('#legend')
         .attr('width', legendWidth)
-        .attr('height', 50);
+        .attr('height', 40);
 
     // Draw the legend
     var legendWidth = +legendSvg.attr("width"),
