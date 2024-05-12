@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LifeLines</title>
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" type="text/css" href="./style_map.css">
+</head>
+
+
+<body>
+    <div id="mapContainer">
+        <!-- Dropdown for selecting the year -->
+        <div class="choose-year">
+            <label for="yearSelector">Select Year:</label>
+            <select id="yearSelector"></select>
+
+            <!-- Slider for dynamic year selection -->
+            <label for="yearSlider">Slide Year:</label>
+            <input type="range" id="yearSlider" class="year-slider" min="1543" max="2021" value="2021" step="1">
+            <span id="yearDisplay">2021</span>
+        </div>
+
+
+        <!-- SVG for the map -->
+        <svg id="birth_rate" width="800" height="600"></svg>
+
+        <!-- Tooltip container -->
+        <div id="tooltip"
+            style="position: absolute; opacity: 0; pointer-events: none; background-color: white; border: solid 1px #ccc; padding: 10px;">
+        </div>
+
+        <!-- Color Legend -->
+        <svg id="legend" width="300" height="50"></svg>
+    </div>
+
+    <script src="./birth-map.js"></script>
+
+</body>
+
+</html>
