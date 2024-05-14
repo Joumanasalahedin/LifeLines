@@ -12,21 +12,17 @@ var path = d3.geoPath().projection(projection);
 
 var globalData; // Store the data globally after initial load
 var colorScale = d3.scaleThreshold()
-    .domain([35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90])
+    .domain([40, 45, 50, 55, 60, 65, 70, 75, 80, 85])
     .range([
-        "#e8ecb6", "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa", "#3cb7b0",
+        "#cbe4ad", "#acdba8", "#8bd2a7", "#66c8aa", "#3cb7b0",
         "#10a4b3", "#0091b0", "#0071a6", "#005198", "#002f80", "#19005e"
     ]);
 
 // Define the SVG for the legend
 document.addEventListener("DOMContentLoaded", function () {
-    // Get the width of the container
     var containerWidth = document.getElementById('mapContainer').clientWidth;
-
-    // Adjust for any padding or borders here if necessary
     var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
-
-    var legendWidthFraction = 0.8; // 80% of the container width
+    var legendWidthFraction = 0.7; // 80% of the container width
     var legendWidth = adjustedWidth * legendWidthFraction;
 
     var legendSvg = d3.select('#legend')
@@ -41,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
     legendSvg.selectAll("rect")
         .data(colorScale.range().map(function (color) {
             var d = colorScale.invertExtent(color);
-            if (d[0] == null) d[0] = colorScale.domain()[0];
+            if (d[0] == null) d[0] = colorScale.domain()[0] - 10;
             if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1];
             return d;
         }))
@@ -56,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     legendSvg.selectAll("text")
         .data(colorScale.domain())
         .enter().append("text")
-        .attr("x", function (d, i) { return i * legendSegmentWidth + (legendSegmentWidth / 2); }) // Center the text
+        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth }) // Center the text
         .attr("y", legendHeight - 5)
         .attr("text-anchor", "middle") // Make sure this is set to "middle"
         .text(function (d) { return d + " years"; });
@@ -130,7 +126,6 @@ function updateMap(year, data) {
             .merge(paths)
             .attr("d", path)
             .attr("fill", function (d) {
-                // Apply the color scale or default color
                 return d.properties.lifeExpectancy ? colorScale(d.properties.lifeExpectancy) : "#cccccc";
             })
             .attr("stroke", "white")
@@ -145,16 +140,16 @@ function updateMap(year, data) {
                     .style("left", (d3.event.pageX + 5) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
 
-                // Highlight the hovered country without changing the fill
+                // Highlight the hovered country
                 d3.select(this)
-                    .attr("stroke", "white") // Change stroke color for visibility
-                    .attr("stroke-width", 2); // Increase stroke width to emphasize
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2);
 
                 // Dim other countries
                 svg.selectAll("path")
                     .style("opacity", 0.5);
                 d3.select(this)
-                    .style("opacity", 1); // Ensure the hovered country has full opacity
+                    .style("opacity", 1);
             })
             .on("mouseout", function (d) {
                 tooltip.transition()

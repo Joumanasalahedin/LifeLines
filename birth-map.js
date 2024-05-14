@@ -27,27 +27,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var legendSvg = d3.select('#legend')
         .attr('width', legendWidth)
-        .attr('height', 40);
+        .attr('height', 50);
 
     // Draw the legend
     var legendWidth = +legendSvg.attr("width"),
         legendHeight = +legendSvg.attr("height"),
         legendSegmentWidth = legendWidth / colorScale.range().length;
 
-    var data = colorScale.range().map(function (color) {
-        var d = colorScale.invertExtent(color);
-        if (d[0] == null) d[0] = colorScale.domain()[0] - 10;
-        if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1] + 10;
-        return d;
-    });
-
-    // Handling overlap by adjusting the first range to start from the correct minimum
-    if (data[0] && data[0][0] == data[1][0]) {
-        data[0][0] = data[0][0] - 5; // Adjust this value as needed
-    }
-
     legendSvg.selectAll("rect")
-        .data(data)
+        .data(colorScale.range().map(function (color) {
+            var d = colorScale.invertExtent(color);
+            if (d[0] == null) d[0] = colorScale.domain()[0] - 10;
+            if (d[1] == null) d[1] = colorScale.domain()[colorScale.domain().length - 1];
+            return d;
+        }))
         .enter().append("rect")
         .style("fill", function (d) { return colorScale(d[0]); })
         .attr("x", function (d, i) { return legendSegmentWidth * i; })
@@ -58,9 +51,9 @@ document.addEventListener("DOMContentLoaded", function () {
     legendSvg.selectAll("text")
         .data(colorScale.domain())
         .enter().append("text")
-        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth; }) // This positions the text at the right edge of each rectangle
+        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth; })
         .attr("y", legendHeight - 5)
-        .attr("text-anchor", "middle") // Align text to the start (left side) at the right edge of the rectangle
+        .attr("text-anchor", "middle")
         .text(function (d) { return d + " years"; });
 });
 
@@ -113,16 +106,16 @@ d3.csv("birth-rate.csv", function (error, data) {
 
 function updateMap(year, data) {
     var yearData = data.filter(d => d.Year === year);
-    var lifeExpectancyByCountry = {};
+    var birthRateByCountry = {};
     yearData.forEach(function (d) {
-        lifeExpectancyByCountry[d.Code] = +d["Birth rate"];
+        birthRateByCountry[d.Code] = +d["Birth rate"];
     });
 
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function (error, mapData) {
         if (error) return console.error("GeoJSON loading error:", error);
 
         mapData.features.forEach(function (feature) {
-            feature.properties.lifeExpectancy = lifeExpectancyByCountry[feature.id] || null;
+            feature.properties.birthRate = birthRateByCountry[feature.id] || null;
         });
 
         var paths = svg.selectAll("path")
@@ -132,8 +125,7 @@ function updateMap(year, data) {
             .merge(paths)
             .attr("d", path)
             .attr("fill", function (d) {
-                // Apply the color scale or default color
-                return d.properties.lifeExpectancy ? colorScale(d.properties.lifeExpectancy) : "#cccccc";
+                return d.properties.birthRate ? colorScale(d.properties.birthRate) : "#cccccc";
             })
             .attr("stroke", "white")
             .attr("stroke-width", 1)
@@ -143,22 +135,20 @@ function updateMap(year, data) {
                     .duration(200)
                     .style("opacity", 0.9);
                 tooltip.html("Country: " + (d.properties.name || "Unknown") + "<br>Birth Rate: " +
-                    (d.properties.lifeExpectancy ? d.properties.lifeExpectancy.toFixed(2) : "No data"))
-                var mouse = d3.mouse(svg.node());
+                    (d.properties.birthRate ? d.properties.birthRate.toFixed(2) : "No data"))
+                    .style("left", (d3.event.pageX + 5) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
 
-                tooltip.style("left", (mouse[0] + 10) + "px")
-                    .style("top", (mouse[1] - 28) + "px");
-
-                // Highlight the hovered country without changing the fill
+                // Highlight the hovered country
                 d3.select(this)
-                    .attr("stroke", "white") // Change stroke color for visibility
-                    .attr("stroke-width", 2); // Increase stroke width to emphasize
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 2);
 
                 // Dim other countries
                 svg.selectAll("path")
                     .style("opacity", 0.5);
                 d3.select(this)
-                    .style("opacity", 1); // Ensure the hovered country has full opacity
+                    .style("opacity", 1);
             })
             .on("mouseout", function (d) {
                 tooltip.transition()
@@ -173,7 +163,7 @@ function updateMap(year, data) {
                 // Reset fill to handle countries with no data
                 svg.selectAll("path")
                     .attr("fill", function (d) {
-                        return d.properties.lifeExpectancy ? colorScale(d.properties.lifeExpectancy) : "#cccccc"; // Use the default color for no data
+                        return d.properties.birthRate ? colorScale(d.properties.birthRate) : "#cccccc"; // Use the default color for no data
                     })
                     .style("opacity", 1);
             });
