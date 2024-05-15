@@ -134,7 +134,7 @@ function updateMap(year, data) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", 0.9);
-                tooltip.html("Country: " + (d.properties.name || "Unknown") + "<br>Birth Rate: " +
+                tooltip.html("<strong>" + (d.properties.name || "Unknown") + "</strong><br>Birth Rate: " +
                     (d.properties.birthRate ? d.properties.birthRate.toFixed(2) : "No data"))
                     .style("left", (d3.event.pageX - 60) + "px")
                     .style("top", (d3.event.pageY - 100) + "px");
