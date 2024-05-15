@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .text(function (d) { return d + " years"; });
 });
 
-d3.csv("/data/birth-rate.csv", function (error, data) {
+d3.csv("data/birth-rate.csv", function (error, data) {
     if (error) throw error;
     globalData = data;
 

@@ -108,7 +108,7 @@ var globalData;
 var years = [];
 
 // Load data and initialize the chart
-d3.csv("/data/bubble_data.csv", function (error, data) {
+d3.csv("data/bubble_data.csv", function (error, data) {
     if (error) throw error;
     globalData = data;
 
