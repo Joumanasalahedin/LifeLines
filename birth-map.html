@@ -10,11 +10,34 @@
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
     <!-- Link to external stylesheet -->
-    <link rel="stylesheet" type="text/css" href="./styles/style_map.css">
+    <link rel="stylesheet" type="text/css" href="./styles/style_birth_map.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 
 <body>
+    <nav class="navbar navbar-expand-lg fixed-top navbar-scroll shadow-0" style="background-color: #fcf1e2;">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">LifeLines</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarExample01"
+                aria-controls="navbarExample01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarExample01">
+                <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="index.html">life expectancy map</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link px-3" href="birth-map.html">birth rate map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="bubble.html">birth rate vs. life expectancy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <h1>Birth Rate</h1>
     <div id="mapContainer">
         <!-- Dropdown for selecting the year -->
@@ -42,6 +65,16 @@
     </div>
 
     <script src="./birth-map.js"></script>
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var navbarHeight = document.querySelector('.navbar').offsetHeight;
+            document.body.style.marginTop = navbarHeight + 'px';
+        });
+    </script>
 
 </body>
 

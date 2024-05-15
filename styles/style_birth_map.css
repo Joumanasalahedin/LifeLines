@@ -13,27 +13,27 @@ body {
 
 .navbar-brand {
     letter-spacing: 3px;
-    color: #749DAD;
+    color: #ad7474;
 }
 
 .navbar-scroll .nav-link,
 .navbar-scroll .fa-bars {
-    color: #5B8899;
+    color: #995b5b;
 }
 
 .navbar-scrolled .nav-link,
 .navbar-scrolled .fa-bars {
-    color: #5B8899;
+    color: #995b5b;
 }
 
 .navbar-scrolled {
-    background-color: #91B2BE;
+    background-color: #be9191;
 }
 
 h1 {
     text-align: center;
     margin-top: 60px;
-    color: #5B8899;
+    color: #995b5b;
 }
 
 #mapContainer {

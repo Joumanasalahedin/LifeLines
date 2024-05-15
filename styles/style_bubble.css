@@ -1,6 +1,39 @@
+body {
+    font-family: -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue";
+}
+
+.navbar-nav .nav-item {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-brand {
+    letter-spacing: 3px;
+    color: #7fad74;
+}
+
+.navbar-scroll .nav-link,
+.navbar-scroll .fa-bars {
+    color: #86b471;
+}
+
+.navbar-scrolled .nav-link,
+.navbar-scrolled .fa-bars {
+    color: #86b471;
+}
+
+.navbar-scrolled {
+    background-color: #91be97;
+}
+
 h1 {
     text-align: center;
-    font-family: Garamond;
+    margin-top: 60px;
+    color: #aab471;
 }
 
 #bubbleContainer {

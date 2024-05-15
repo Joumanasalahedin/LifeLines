@@ -7,15 +7,15 @@
     <title>LifeLines</title>
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v4.js"></script>
-    <!-- Load color scale -->
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/d3-force.v1.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="./styles/style_bubble.css">
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" type="text/css" href="./styles/style_map.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg fixed-top navbar-scroll shadow-0" style="background-color: #d9e49d;">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-scroll shadow-0" style="background-color: #a3dfdf;">
         <div class="container">
             <a class="navbar-brand" href="index.html">LifeLines</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarExample01"
@@ -24,36 +24,45 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarExample01">
                 <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
+                    <li class="nav-item active">
                         <a class="nav-link px-3" href="index.html">life expectancy map</a>
                     </li>
-                    <li class="nav-item ">
+                    <li class="nav-item">
                         <a class="nav-link px-3" href="birth-map.html">birth rate map</a>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a class="nav-link px-3" href="bubble.html">birth rate vs. life expectancy</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    <h1>Birth Date vs. Life Expectancy</h1>
-    <div id="bubbleContainer">
-        <div id="controls">
+    <h1>Life Expectancy at birth</h1>
+    <div id="mapContainer">
+        <!-- Dropdown for selecting the year -->
+        <div class="choose-year">
             <label for="yearSelector">Select Year:</label>
             <select id="yearSelector"></select>
+
+            <!-- Slider for dynamic year selection -->
             <label for="yearSlider">Slide Year:</label>
-            <input type="range" id="yearSlider" class="year-slider" min="2000" max="2020" value="2020" step="1">
-            <span id="yearDisplay">2020</span>
+            <input type="range" id="yearSlider" class="year-slider" min="1543" max="2021" value="2021" step="1">
+            <span id="yearDisplay">2021</span>
         </div>
-        <div id="legend"></div>
+
+        <!-- SVG for the map -->
+        <svg id="my_dataviz" width="800" height="600"></svg>
+
         <!-- Tooltip container -->
         <div id="tooltip"
             style="position: absolute; opacity: 0; pointer-events: none; background-color: white; border: solid 1px #ccc; padding: 10px;">
         </div>
+
+        <!-- Color Legend -->
+        <svg id="legend" width="300" height="50"></svg>
     </div>
 
-    <script src="./bubble.js"></script>
+    <script src="./map.js"></script>
     <!-- Bootstrap JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
