@@ -1,0 +1,15 @@
+{
+  "name": "lifelines",
+  "version": "1.0.0",
+  "description": "A project for visualizing life expectancy and birth rate data with choropleth maps and a bubble chart.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

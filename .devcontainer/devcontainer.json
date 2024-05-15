@@ -1,20 +1,24 @@
 {
-    "name": "LifeLines Development Container",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": ".."
-    },
-    "settings": {
-        "terminal.integrated.shell.linux": "/bin/bash"
-    },
-    "extensions": [
+  "name": "LifeLines",
+  "image": "mcr.microsoft.com/vscode/devcontainers/javascript-node:0-14",
+  "customizations": {
+    "vscode": {
+      "extensions": [
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-tslint-plugin"
-    ],
-    "forwardPorts": [
-        8080
-    ],
-    "postCreateCommand": "npm install",
-    "remoteUser": "vscode"
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash"
+      }
+    }
+  },
+  "forwardPorts": [3000],
+  "postCreateCommand": "npm install",
+  "postStartCommand": "npm start",
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "openBrowser"
+    }
+  }
 }
