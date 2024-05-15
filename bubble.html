@@ -23,9 +23,9 @@
     </div>
 
     <script>
-        var margin = { top: 40, right: 30, bottom: 30, left: 80 },
+        var margin = { top: 40, right: 30, bottom: 80, left: 80 },
             width = 1000 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
+            height = 650 - margin.top - margin.bottom;
 
         var svg = d3.select("#bubbleContainer")
             .append("svg")
@@ -39,11 +39,11 @@
 
         // Define the scales
         var x = d3.scaleLinear()
-            .domain([0, 45])  // Adjust domain based on your data
+            .domain([5, 50])  // Adjust domain based on your data
             .range([0, width]);
 
         var y = d3.scaleLinear()
-            .domain([55, 85])
+            .domain([50, 85])
             .range([height, 0]);
 
         var z = d3.scaleSqrt()
@@ -57,12 +57,12 @@
         // Gridlines in y-axis function
         function make_y_gridlines() {
             return d3.axisLeft(y)
-                .ticks(10);
+                .ticks(11);
         }
 
         function make_x_gridlines() {
             return d3.axisBottom(x)
-                .ticks(10)  // Adjust number of ticks based on your data
+                .ticks(10)
                 .tickSize(-height);
         }
 
@@ -84,18 +84,32 @@
 
         d3.csv("bubble_2020.csv", function (data) {
             data.forEach(function (d) {
-                // Convert strings to numbers
                 d['Birth rate'] = +d['Birth rate'];
                 d['Period life expectancy at birth'] = +d['Period life expectancy at birth'];
                 d['Population'] = +d['Population'];
             });
 
             svg.append("g").attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x).tickValues([0, 5, 10, 15, 20, 25, 30, 35, 40, 45])
-                    .tickFormat(d3.format("d")));  // Formatting ticks as integers
+                .call(d3.axisBottom(x).tickValues([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
+                    .tickFormat(d3.format("d")));
 
             svg.append("g")
-                .call(d3.axisLeft(y).tickValues([55, 60, 65, 70, 75, 80, 85]));
+                .call(d3.axisLeft(y).tickValues([50, 55, 60, 65, 70, 75, 80, 85]));
+
+            // Add X Axis title
+            svg.append("text")
+                .attr("text-anchor", "middle")
+                .attr("x", width / 2)
+                .attr("y", height + margin.top + 10)
+                .text("Birth Rate per 1,000 people");
+
+            // Add Y Axis title
+            svg.append("text")
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(-90)")
+                .attr("y", -margin.left + 30)
+                .attr("x", -height / 2)
+                .text("Life Expectancy");
 
             var circles = svg.append('g')
                 .selectAll("circle")
@@ -130,14 +144,32 @@
             // List of additional countries you want to label explicitly
             var additionalLabels = ["China", "Australia", "Egypt", "Saudi Arabia", "United States"];
 
+            // Create a grid system to space out labels
+            var gridSizeX = width / 5;
+            var gridSizeY = height / 5;
+            var grid = {};
+
+            function getGridCell(x, y) {
+                var col = Math.floor(x / gridSizeX);
+                var row = Math.floor(y / gridSizeY);
+                return col + "-" + row;
+            }
+
             // Sort data by Birth rate and life expectancy for linear labeling
             var sortedData = data.sort(function (a, b) {
                 return d3.ascending(+a['Birth rate'], +b['Birth rate']) || d3.ascending(+a['Period life expectancy at birth'], +b['Period life expectancy at birth']);
             });
 
             // Select a subset of sorted data for labeling
-            var dynamicallyLabeledData = sortedData.filter(function (d, i) {
-                return i % Math.floor(sortedData.length / 18) === 0;
+            var dynamicallyLabeledData = [];
+            sortedData.forEach(function (d) {
+                var cx = x(d['Birth rate']);
+                var cy = y(d['Period life expectancy at birth']);
+                var cell = getGridCell(cx, cy);
+                if (!grid[cell]) {
+                    dynamicallyLabeledData.push(d);
+                    grid[cell] = true;
+                }
             });
 
             // Combine dynamically selected data with manually specified labels
