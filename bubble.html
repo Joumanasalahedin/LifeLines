@@ -37,12 +37,22 @@
 
         var tooltip = d3.select("#tooltip");
 
-        var x = d3.scaleLog().domain([1000, 100000]).range([0, width]).clamp(true);
-        var y = d3.scaleLinear().domain([55, 85]).range([height, 0]).clamp(true);
-        var z = d3.scaleSqrt().domain([0, 1310000000]).range([2, 20]);
-        var myColor = d3.scaleOrdinal().domain(["Asia", "Europe", "North America", "South America", "Africa", "Oceania"])
-            .range(["#F0803C", "#8F0079", "#6DB1BF", "#E462A8", "#838B55", "#324A5F"]);
+        // Define the scales
+        var x = d3.scaleLinear()
+            .domain([0, 45])  // Adjust domain based on your data
+            .range([0, width]);
 
+        var y = d3.scaleLinear()
+            .domain([55, 85])
+            .range([height, 0]);
+
+        var z = d3.scaleSqrt()
+            .domain([0, 1310000000])
+            .range([2, 20]);
+
+        var myColor = d3.scaleOrdinal()
+            .domain(["Asia", "Europe", "North America", "South America", "Africa", "Oceania"])
+            .range(["#F0803C", "#8F0079", "#6DB1BF", "#E462A8", "#838B55", "#324A5F"]);
 
         // Gridlines in y-axis function
         function make_y_gridlines() {
@@ -51,17 +61,8 @@
         }
 
         function make_x_gridlines() {
-            var majorTicks = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
-            var minorTicks = majorTicks.map((value, index, array) => {
-                if (index < array.length - 1) {
-                    return Math.sqrt(value * array[index + 1]); // Geometric mean for log scale middle
-                }
-            }).filter(d => d); // Remove undefined entries
-
-            var allTicks = majorTicks.concat(minorTicks).sort((a, b) => a - b); // Combine and sort all ticks
-
             return d3.axisBottom(x)
-                .tickValues(allTicks)
+                .ticks(10)  // Adjust number of ticks based on your data
                 .tickSize(-height);
         }
 
@@ -81,17 +82,18 @@
                 .tickFormat("")
             );
 
-        d3.csv("data_2020.csv", function (data) {
+        d3.csv("bubble_2020.csv", function (data) {
             data.forEach(function (d) {
                 // Convert strings to numbers
-                d['GDP per capita'] = +d['GDP per capita'];
+                d['Birth rate'] = +d['Birth rate'];
                 d['Period life expectancy at birth'] = +d['Period life expectancy at birth'];
-                d['Population (historical estimates)'] = +d['Population (historical estimates)'];
+                d['Population'] = +d['Population'];
             });
 
             svg.append("g").attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x).tickValues([1000, 2000, 5000, 10000, 20000, 50000, 100000])
-                    .tickFormat(d3.format("$,")));
+                .call(d3.axisBottom(x).tickValues([0, 5, 10, 15, 20, 25, 30, 35, 40, 45])
+                    .tickFormat(d3.format("d")));  // Formatting ticks as integers
+
             svg.append("g")
                 .call(d3.axisLeft(y).tickValues([55, 60, 65, 70, 75, 80, 85]));
 
@@ -100,9 +102,9 @@
                 .data(data)
                 .enter()
                 .append("circle")
-                .attr("cx", function (d) { return x(Math.max(1000, Math.min(100000, d['GDP per capita']))); })
-                .attr("cy", function (d) { return y(Math.max(55, Math.min(85, d['Period life expectancy at birth']))); })
-                .attr("r", function (d) { return z(d['Population (historical estimates)']); })
+                .attr("cx", function (d) { return x(d['Birth rate']); })
+                .attr("cy", function (d) { return y(d['Period life expectancy at birth']); })
+                .attr("r", function (d) { return z(d['Population']); })
                 .style("fill", function (d) { return myColor(d['Continent']); })
                 .style("opacity", "0.7")
                 .attr("stroke", "black")
@@ -111,9 +113,9 @@
             circles.on("mouseover", function (d) {
                 tooltip.transition().duration(200).style("opacity", .9);
                 tooltip.html("<strong>" + d.Entity + "</strong>" +
-                    "<br/>GDP per Capita: $" + d['GDP per capita'].toFixed(2) +
+                    "<br/>Birth Rate: " + d['Birth rate'].toFixed(2) +
                     "<br/>Life Expectancy: " + d['Period life expectancy at birth'].toFixed(2) + " years" +
-                    "<br/>Population: " + d['Population (historical estimates)'].toLocaleString())
+                    "<br/>Population: " + d['Population'].toLocaleString())
                     .style("left", (d3.event.pageX + 5) + "px")
                     .style("top", (d3.event.pageY - 28) + "px");
 
@@ -128,14 +130,14 @@
             // List of additional countries you want to label explicitly
             var additionalLabels = ["China", "Australia", "Egypt", "Saudi Arabia", "United States"];
 
-            // Sort data by GDP per capita and life expectancy for linear labeling
+            // Sort data by Birth rate and life expectancy for linear labeling
             var sortedData = data.sort(function (a, b) {
-                return d3.ascending(+a['GDP per capita'], +b['GDP per capita']) || d3.ascending(+a['Period life expectancy at birth'], +b['Period life expectancy at birth']);
+                return d3.ascending(+a['Birth rate'], +b['Birth rate']) || d3.ascending(+a['Period life expectancy at birth'], +b['Period life expectancy at birth']);
             });
 
             // Select a subset of sorted data for labeling
             var dynamicallyLabeledData = sortedData.filter(function (d, i) {
-                return i % Math.floor(sortedData.length / 20) === 0;
+                return i % Math.floor(sortedData.length / 18) === 0;
             });
 
             // Combine dynamically selected data with manually specified labels
@@ -152,23 +154,21 @@
                 .enter()
                 .append("text")
                 .attr("x", function (d) {
-                    var baseX = x(Math.max(1000, Math.min(100000, +d['GDP per capita'])));
-                    return d['Population (historical estimates)'] > 100000000 ? baseX + z(d['Population (historical estimates)']) + 5 : baseX;
+                    var baseX = x(d['Birth rate']);
+                    return d['Population'] > 100000000 ? baseX + z(d['Population']) + 5 : baseX;
                 })
                 .attr("y", function (d) {
-                    var baseY = y(Math.max(55, Math.min(85, +d['Period life expectancy at birth'])));
-                    return d['Population (historical estimates)'] > 100000000 ? baseY - z(d['Population (historical estimates)']) : baseY - 15;
+                    var baseY = y(d['Period life expectancy at birth']);
+                    return d['Population'] > 100000000 ? baseY - z(d['Population']) : baseY - 15;
                 })
                 .text(function (d) { return d.Entity; })
                 .attr("font-size", "15px")
                 .attr("text-anchor", function (d) {
-                    return d['Population (historical estimates)'] > 100000000 ? "start" : "middle";
+                    return d['Population'] > 100000000 ? "start" : "middle";
                 })
                 .attr("alignment-baseline", "middle")
                 .style("fill", function (d) { return myColor(d['Continent']); })
                 .attr("font-weight", "bolder")
-                // .attr("stroke", "white")
-                // .style("stroke-width", "0.1px")
                 .style("text-shadow", "1px 0px 0px white");
 
             // Optionally add leader lines
@@ -177,15 +177,15 @@
                 .data(labeledData)
                 .enter()
                 .append("line")
-                .attr("x1", function (d) { return x(Math.max(1000, Math.min(100000, +d['GDP per capita']))); })
-                .attr("y1", function (d) { return y(Math.max(55, Math.min(85, +d['Period life expectancy at birth']))); })
+                .attr("x1", function (d) { return x(d['Birth rate']); })
+                .attr("y1", function (d) { return y(d['Period life expectancy at birth']); })
                 .attr("x2", function (d) {
-                    var baseX = x(Math.max(1000, Math.min(100000, +d['GDP per capita'])));
-                    return d['Population (historical estimates)'] > 100000000 ? baseX + z(d['Population (historical estimates)']) + 5 : baseX;
+                    var baseX = x(d['Birth rate']);
+                    return d['Population'] > 100000000 ? baseX + z(d['Population']) + 5 : baseX;
                 })
                 .attr("y2", function (d) {
-                    var baseY = y(Math.max(55, Math.min(85, +d['Period life expectancy at birth'])));
-                    return d['Population (historical estimates)'] > 100000000 ? baseY - z(d['Population (historical estimates)']) : baseY - 15;
+                    var baseY = y(d['Period life expectancy at birth']);
+                    return d['Population'] > 100000000 ? baseY - z(d['Population']) : baseY - 15;
                 })
                 .attr("stroke", "grey")
                 .style("stroke-dasharray", ("3, 3"));
