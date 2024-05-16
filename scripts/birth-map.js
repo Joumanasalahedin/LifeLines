@@ -10,7 +10,7 @@ var projection = d3.geoNaturalEarth1()
 
 var path = d3.geoPath().projection(projection);
 
-var globalData; // Store the data globally after initial load
+var globalData;
 var colorScale = d3.scaleThreshold()
     .domain([10, 15, 20, 25, 30, 35, 40, 50])
     .range([
@@ -66,12 +66,10 @@ d3.csv("data/birth-rate.csv", function (error, data) {
     var slider = document.getElementById("yearSlider");
     var yearDisplay = document.getElementById("yearDisplay");
 
-    // Configure slider based on indices of years array
     slider.min = 0;
     slider.max = years.length - 1;
-    slider.value = years.length - 1; // Set the initial value to the last index
+    slider.value = years.length - 1;
 
-    // Populate the dropdown
     selector.selectAll('option')
         .data(years)
         .enter().append('option')
@@ -79,7 +77,6 @@ d3.csv("data/birth-rate.csv", function (error, data) {
         .attr("value", function (d) { return d; })
         .property("selected", function (d) { return d === years[years.length - 1]; });
 
-    // Sync display and update map initially
     yearDisplay.textContent = years[slider.value];
     updateMap(years[slider.value], globalData);
 
@@ -139,12 +136,10 @@ function updateMap(year, data) {
                     .style("left", (d3.event.pageX - 60) + "px")
                     .style("top", (d3.event.pageY - 100) + "px");
 
-                // Highlight the hovered country
                 d3.select(this)
                     .attr("stroke", "white")
                     .attr("stroke-width", 2);
 
-                // Dim other countries
                 svg.selectAll("path")
                     .style("opacity", 0.5);
                 d3.select(this)
@@ -155,19 +150,17 @@ function updateMap(year, data) {
                     .duration(500)
                     .style("opacity", 0);
 
-                // Reset stroke styles
                 d3.select(this)
                     .attr("stroke", "white")
                     .attr("stroke-width", 1);
 
-                // Reset fill to handle countries with no data
                 svg.selectAll("path")
                     .attr("fill", function (d) {
-                        return d.properties.birthRate ? colorScale(d.properties.birthRate) : "#cccccc"; // Use the default color for no data
+                        return d.properties.birthRate ? colorScale(d.properties.birthRate) : "#cccccc";
                     })
                     .style("opacity", 1);
             });
 
-        paths.exit().remove(); // Remove unused paths
+        paths.exit().remove();
     });
 }

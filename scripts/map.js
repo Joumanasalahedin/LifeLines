@@ -10,7 +10,7 @@ var projection = d3.geoNaturalEarth1()
 
 var path = d3.geoPath().projection(projection);
 
-var globalData; // Store the data globally after initial load
+var globalData;
 var colorScale = d3.scaleThreshold()
     .domain([40, 45, 50, 55, 60, 65, 70, 75, 80, 85])
     .range([
@@ -22,7 +22,7 @@ var colorScale = d3.scaleThreshold()
 document.addEventListener("DOMContentLoaded", function () {
     var containerWidth = document.getElementById('mapContainer').clientWidth;
     var adjustedWidth = containerWidth - (parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-left')) + parseFloat(window.getComputedStyle(document.getElementById('mapContainer'), null).getPropertyValue('padding-right')));
-    var legendWidthFraction = 0.7; // 80% of the container width
+    var legendWidthFraction = 0.7;
     var legendWidth = adjustedWidth * legendWidthFraction;
 
     var legendSvg = d3.select('#legend')
@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
     legendSvg.selectAll("text")
         .data(colorScale.domain())
         .enter().append("text")
-        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth }) // Center the text
+        .attr("x", function (d, i) { return (i + 1) * legendSegmentWidth })
         .attr("y", legendHeight - 5)
-        .attr("text-anchor", "middle") // Make sure this is set to "middle"
+        .attr("text-anchor", "middle")
         .text(function (d) { return d + " years"; });
 });
 
@@ -67,10 +67,9 @@ d3.csv("data/life-expectancy.csv", function (error, data) {
     var slider = document.getElementById("yearSlider");
     var yearDisplay = document.getElementById("yearDisplay");
 
-    // Configure slider based on indices of years array
     slider.min = 0;
     slider.max = years.length - 1;
-    slider.value = years.length - 1; // Set the initial value to the last index
+    slider.value = years.length - 1;
 
     // Populate the dropdown
     selector.selectAll('option')
@@ -80,7 +79,6 @@ d3.csv("data/life-expectancy.csv", function (error, data) {
         .attr("value", function (d) { return d; })
         .property("selected", function (d) { return d === years[years.length - 1]; });
 
-    // Sync display and update map initially
     yearDisplay.textContent = years[slider.value];
     updateMap(years[slider.value], globalData);
 
@@ -140,12 +138,10 @@ function updateMap(year, data) {
                     .style("left", (d3.event.pageX - 60) + "px")
                     .style("top", (d3.event.pageY - 100) + "px");
 
-                // Highlight the hovered country
                 d3.select(this)
                     .attr("stroke", "white")
                     .attr("stroke-width", 2);
 
-                // Dim other countries
                 svg.selectAll("path")
                     .style("opacity", 0.5);
                 d3.select(this)
@@ -156,19 +152,17 @@ function updateMap(year, data) {
                     .duration(500)
                     .style("opacity", 0);
 
-                // Reset stroke styles
                 d3.select(this)
                     .attr("stroke", "white")
                     .attr("stroke-width", 1);
 
-                // Reset fill to handle countries with no data
                 svg.selectAll("path")
                     .attr("fill", function (d) {
-                        return d.properties.lifeExpectancy ? colorScale(d.properties.lifeExpectancy) : "#cccccc"; // Use the default color for no data
+                        return d.properties.lifeExpectancy ? colorScale(d.properties.lifeExpectancy) : "#cccccc";
                     })
                     .style("opacity", 1);
             });
 
-        paths.exit().remove(); // Remove unused paths
+        paths.exit().remove();
     });
 }

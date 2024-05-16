@@ -50,7 +50,6 @@ function updateGridLines() {
         .tickSize(-width)
         .tickFormat(""));
 
-    // Add mid-tick lines
     var xTicks = x.ticks(5);
     var yTicks = y.ticks(2);
 
@@ -185,7 +184,6 @@ function updateChart(year, data) {
     x.domain([d3.min(yearData, d => d['Birth rate']), d3.max(yearData, d => d['Birth rate'])]);
     y.domain([d3.min(yearData, d => d['Period life expectancy at birth']), d3.max(yearData, d => d['Period life expectancy at birth'])]);
 
-    // Update the axes
     xAxis.transition().duration(1000).call(d3.axisBottom(x));
     yAxis.transition().duration(1000).call(d3.axisLeft(y));
 
@@ -214,7 +212,7 @@ function updateChart(year, data) {
                 .style("top", (d3.event.pageY - 90) + "px");
 
             circles.style("opacity", 0.2);
-            d3.select(this).style("opacity", 1);  // Highlight the current circle
+            d3.select(this).style("opacity", 1);
         })
         .on("mouseout", function () {
             tooltip.transition().duration(500).style("opacity", 0);
