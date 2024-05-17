@@ -1,5 +1,7 @@
 # LifeLines Report
 
+[LifeLines Repo](https://github.com/Joumanasalahedin/LifeLines)
+
 ## Purpose
 Life expectancy and birth rates are two fundamental indicators of societal health and development. This project, LifeLines, was born out of a personal and empathetic desire to understand and visualize these critical metrics. Growing up in a region where healthcare and life expectancy are pressing issues, I have witnessed firsthand the profound impact these factors have on communities and families. I chose this topic because of its direct relevance to public health, economic stability, and overall societal well-being. Understanding these metrics can help in identifying areas that need urgent attention, developing policies that can improve public health, and ultimately, saving lives. According to the World Health Organization ([WHO](https://www.who.int/news/item/04-04-2019-uneven-access-to-health-services-drives-life-expectancy-gaps-who)), there are substantial disparities in life expectancy and birth rates globally. In high-income countries, life expectancy can exceed 80 years, while in low-income countries, it may be below 60 years. Additionally, birth rates also vary significantly, with some countries experiencing as high as 40 births per 1,000 people, while others have rates as low as 7 births per 1,000 people​ ([WHO](https://www.who.int/news/item/04-04-2019-uneven-access-to-health-services-drives-life-expectancy-gaps-who)).
 
